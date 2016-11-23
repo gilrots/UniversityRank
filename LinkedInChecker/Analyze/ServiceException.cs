@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 
 namespace LinkedInChecker.View
@@ -11,7 +8,7 @@ namespace LinkedInChecker.View
     /// Represents internet Services progress Exceptions
     /// </summary>
     
-    public class ServiceException : FormatException
+    public class ServiceException : Exception
     {
         public ServiceException()
         {
