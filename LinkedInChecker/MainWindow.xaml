@@ -1,0 +1,176 @@
+﻿<Window x:Class="LinkedInChecker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:con="clr-namespace:LinkedInChecker"
+        xmlns:local="clr-namespace:LinkedInChecker"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" FlowDirection="LeftToRight" WindowState="Maximized">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <DockPanel LastChildFill="False">
+                <TextBlock  VerticalAlignment="Center">search:</TextBlock>
+                <TextBox VerticalAlignment="Center" x:Name="FilterTextBox" Width="100" MaxLength="20" Height="20" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged">
+                            <i:InvokeCommandAction Command="{Binding GeneralFilterProfile}" CommandParameter="{Binding Text,ElementName=FilterTextBox}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+            </DockPanel>
+            <DockPanel LastChildFill="False" Grid.Column="1">
+                <TextBlock VerticalAlignment="Center">search skill:</TextBlock>
+                <TextBox VerticalAlignment="Center" x:Name="Skilltxt" Width="100" MaxLength="20" Height="20"/>
+                <Button Height="20" Command="{Binding SkillsSearchProfile}" CommandParameter="{Binding Text, ElementName=Skilltxt}">search</Button>
+            </DockPanel>
+            <DockPanel LastChildFill="False" Grid.Column="2">
+                <TextBlock VerticalAlignment="Center">Display Profiles</TextBlock>
+                <ComboBox VerticalAlignment="Center" x:Name="cbDisplayProfile" Width="100" Height="20" SelectedIndex="0">
+                    <ComboBox.Items>
+                        <ComboBoxItem Content="All"/>
+                        <ComboBoxItem Content="Recently Add"/>
+                    </ComboBox.Items>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding ChangeDisplayProfile}" CommandParameter="{Binding SelectedIndex,ElementName=cbDisplayProfile}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+            </DockPanel>
+          
+                <DockPanel LastChildFill="False" Grid.Column="4">
+                <TextBlock VerticalAlignment="Center">Analyze English</TextBlock>
+                <Button Height="20" Command="{Binding AnalyzeEnglishQuality}" CommandParameter="{Binding Path=SelectedItem.ID,ElementName=ProfileControl}">Analyze</Button>
+            </DockPanel>
+            <DockPanel LastChildFill="False" Grid.Column="5">
+                <Label VerticalAlignment="Center" Name="Profile_name_txt" Content="{Binding ProfileAnalyzer.ProfileName}" Visibility="{Binding ProfileAnalyzer.IsValid, Converter={StaticResource BoolToVis}}"/>
+                <Label VerticalAlignment="Center" Name="EnglishAnlayze_txt" Content="{Binding ProfileAnalyzer.ProfileEnglishLevel}"  Visibility="{Binding ProfileAnalyzer.IsValid, Converter={StaticResource BoolToVis}}"/>
+            </DockPanel>
+        </Grid>
+        <StackPanel Grid.Row="1">
+            <Grid Background="White" >
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </StackPanel>
+        <ListView Grid.Row="2" x:Name="ProfileControl" SelectionMode="Single"
+            ItemsSource="{Binding ProfilesManager.Profiles}">
+
+            <ListView.View>
+                <GridView>
+                <GridViewColumn Header="Name" Width="150" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Current title" Width="80" DisplayMemberBinding="{Binding CurrentTitle}" />
+                    <GridViewColumn Header="Current position" Width="150" DisplayMemberBinding="{Binding CurrentPosition}"/>
+                    <GridViewColumn Header="Summary" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap" Text="{Binding Summary}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Skills" Width="100" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="">
+                                <Expander IsExpanded="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=ListViewItem, Mode=FindAncestor}}">
+                                    <StackPanel>
+                                        <ListView x:Name="SkillsControl" ItemsSource="{Binding Skills}">
+                                            <ListView.View>
+                                                <GridView>
+                                                    <GridViewColumn Header="title" Width="Auto" DisplayMemberBinding="{Binding Title}"/>
+                                                </GridView>
+                                            </ListView.View>
+                                        </ListView>
+                                        <Grid Background="White">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="100"/>
+                                                <ColumnDefinition Width="100"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" >Count skills:</TextBlock>
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ElementName=SkillsControl, Path=Items.Count}"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Expander>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Education" Width="400" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="">
+                                <Expander IsExpanded="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=ListViewItem, Mode=FindAncestor}}">
+                                    <ScrollViewer MaxHeight="500">
+                                        <StackPanel>
+                                            <ListView x:Name="EducationControl" ItemsSource="{Binding EducationExperience}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn x:Name="School" Header="School" Width="Auto" DisplayMemberBinding="{Binding School}"/>
+                                                        <GridViewColumn Header="DegreeType" Width="Auto" DisplayMemberBinding="{Binding DegreeType}"/>
+                                                        <GridViewColumn Header="FieldOfStudy" Width="Auto" DisplayMemberBinding="{Binding FieldOfStudy}"/>
+                                                        <GridViewColumn Header="From" Width="Auto" DisplayMemberBinding="{Binding StartYear}"/>
+                                                        <GridViewColumn Header="To" Width="Auto" DisplayMemberBinding="{Binding YearTo}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Expander>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="WorkExperience" Width="300" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="">
+                                <Expander IsExpanded="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=ListViewItem, Mode=FindAncestor}}">
+                                    <ScrollViewer MaxHeight="500">
+                                        <StackPanel>
+                                            <ListView x:Name="WorkControl" ItemsSource="{Binding WorkExperience}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Header="JobTitle" Width="Auto" DisplayMemberBinding="{Binding JobTitle}"/>
+                                                        <GridViewColumn Header="Work At" Width="Auto" DisplayMemberBinding="{Binding Place}"/>
+                                                        <GridViewColumn Header="From" Width="Auto" DisplayMemberBinding="{Binding DateFrom,StringFormat=\{0:MM-yy\}}"/>
+                                                        <GridViewColumn Header="To" Width="Auto" DisplayMemberBinding="{Binding DateTo,StringFormat=\{0:MM-yy\}}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                           
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Expander>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
